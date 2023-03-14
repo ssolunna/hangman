@@ -13,3 +13,11 @@ end
 
 dictionary = load_dictionary('dictionary.txt')
 word = select_random_word(dictionary)
+
+guess = 'a'
+chances_left = 5 # Represents the num of incorrect guesses allowed
+
+# Counts the remaining incorrect guesses
+chances_left -= 1 unless word.include?(guess)
+
+puts "Chances left: #{chances_left}"
