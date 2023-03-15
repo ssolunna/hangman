@@ -15,6 +15,12 @@ def display_word(word, guess)
   puts word.gsub(/[^#{guess}]/, '_') # Display only the correct letter guess
 end
 
+def display_incorrect_letters(word, guess)
+  wrong_guesses = []
+  wrong_guesses << guess unless word.include?(guess)
+  puts "Wrong guesses: '#{wrong_guesses.join}'"
+end
+
 dictionary = load_dictionary('dictionary.txt')
 
 word = select_random_word(dictionary)
@@ -29,3 +35,5 @@ display_word(word, guess)
 chances_left -= 1 unless word.include?(guess)
 
 puts "Chances left: #{chances_left}"
+
+display_incorrect_letters(word, guess)
