@@ -1,64 +1,67 @@
 # frozen_string_literal: true
 
-def load_dictionary(file)
-  dictionary = File.open(file, 'r', &:readlines)
-  dictionary.map(&:chomp)
-end
-
-def select_random_word(dictionary)
-  # Selects a word between 5 and 12 characters
-  dictionary.filter { |word| word.length > 4 && word.length < 13 }.sample
-end
-
-def display_word(word, correct_letters)
-  print ' Word: '
-
-  if correct_letters.empty?
-    word.length.times { print '_' }
-  else
-    # Displays only the correct letter guess
-    print word.gsub(/[^#{correct_letters.join}]/, '_')
+class Game
+  def initialize(dictionary)
+    @dictionary = load_dictionary(dictionary)
+    @word = select_random_word(@dictionary)
+    @chances = 5 # Num of incorrect guesses allowed
+    @correct_letters = []
+    @incorrect_letters = []
   end
 
-  puts
-end
+  def play
+    until @chances.zero? || player_won?
+      guess = make_guess
 
-def make_guess
-  print 'Guess: '
-  gets.chomp.downcase
-end
+      log_guess(guess)
 
-def player_won?(word, correct_letters)
-  word.split('').all? { |word_letter| correct_letters.include?(word_letter) }
-end
+      display_word
 
-def play(word, chances, incorrect_letters, correct_letters)
-  until chances.zero? || player_won?(word, correct_letters)
-    guess = make_guess
+      puts "Wrong guesses: '#{@incorrect_letters.join(' ')}'"
 
-    if word.include?(guess)
-      correct_letters << guess unless correct_letters.include?(guess)
+      puts "Chances left: #{@chances}"
+    end
+  end
+
+  def load_dictionary(file)
+    File.open(file, 'r', &:readlines).map(&:chomp)
+  end
+
+  def select_random_word(dictionary)
+    # Selects a word between 5 and 12 characters
+    dictionary.filter { |word| word.length > 4 && word.length < 13 }.sample
+  end
+
+  def display_word
+    print ' Word: '
+
+    if @correct_letters.empty?
+      @word.length.times { print '_' }
     else
-      chances -= 1 # Counts the remaining incorrect guesses
-      incorrect_letters << guess unless incorrect_letters.include?(guess)
+      # Displays only the correct letter guess
+      print @word.gsub(/[^#{@correct_letters.join}]/, '_')
     end
 
-    display_word(word, correct_letters)
+    puts
+  end
 
-    puts "Wrong guesses: '#{incorrect_letters.join(' ')}'"
+  def make_guess
+    print 'Guess: '
+    gets.chomp.downcase
+  end
 
-    puts "Chances left: #{chances}"
+  def log_guess(guess)
+    if @word.include?(guess)
+      @correct_letters << guess unless @correct_letters.include?(guess)
+    else
+      @chances -= 1
+      @incorrect_letters << guess unless @incorrect_letters.include?(guess)
+    end
+  end
+
+  def player_won?
+    @word.split('').all? { |word_letter| @correct_letters.include?(word_letter) }
   end
 end
 
-dictionary = load_dictionary('dictionary.txt')
-
-word = select_random_word(dictionary)
-
-chances = 5 # Represents the num of incorrect guesses allowed
-
-correct_letters = []
-
-incorrect_letters = []
-
-play(word, chances, incorrect_letters, correct_letters)
+Game.new('dictionary.txt').play
