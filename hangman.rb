@@ -28,8 +28,12 @@ def make_guess
   gets.chomp.downcase
 end
 
+def player_won?(word, correct_letters)
+  word.split('').all? { |word_letter| correct_letters.include?(word_letter) }
+end
+
 def play(word, chances, incorrect_letters, correct_letters)
-  until chances.zero?
+  until chances.zero? || player_won?(word, correct_letters)
     guess = make_guess
 
     if word.include?(guess)
