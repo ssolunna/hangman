@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 class Game
   def initialize(dictionary)
     @dictionary = load_dictionary(dictionary)
@@ -12,6 +14,8 @@ class Game
   def play
     until @chances.zero? || player_won?
       guess = make_guess
+
+      return if guess.nil?
 
       log_guess(guess)
 
@@ -47,7 +51,14 @@ class Game
 
   def make_guess
     print 'Guess: '
-    gets.chomp.downcase
+    guess = gets.chomp.downcase
+
+    if guess == 'save'
+      save_game
+      nil
+    else
+      guess
+    end
   end
 
   def log_guess(guess)
@@ -61,6 +72,19 @@ class Game
 
   def player_won?
     @word.split('').all? { |word_letter| @correct_letters.include?(word_letter) }
+  end
+
+  def save_game
+    File.open('saved_game.txt', 'w') do |file|
+      file.puts JSON.dump({
+      word: @word,
+      chances: @chances,
+      correct_letters: @correct_letters,
+      incorrect_letters: @incorrect_letters
+      })
+    end
+
+    puts 'Game saved.', 'Exiting...'
   end
 end
 
