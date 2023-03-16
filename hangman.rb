@@ -4,6 +4,8 @@ require 'json'
 
 class Game
   def initialize(dictionary)
+    return if File.exist?('saved_game.txt') && load_saved_game?
+
     @dictionary = load_dictionary(dictionary)
     @word = select_random_word(@dictionary)
     @chances = 5 # Num of incorrect guesses allowed
@@ -85,6 +87,26 @@ class Game
     end
 
     puts 'Game saved.', 'Exiting...'
+  end
+
+  def load_saved_game?
+    print 'Saved game detected. Do you want to load it? [y|N]: '
+    response = gets.chomp
+
+    return unless response.downcase == 'y' || response.downcase == 'yes'
+
+    load_game
+    true
+  end
+
+  def load_game
+    saved_game = JSON.parse(File.read('saved_game.txt'))
+
+    saved_game.each do |variable, value|
+      instance_variable_set("@#{variable}", value)
+    end
+
+    File.delete('saved_game.txt')
   end
 end
 
