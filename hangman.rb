@@ -16,7 +16,7 @@ class Game
   def play
     until @chances.zero? || player_won?
       display_layout
-      
+
       guess = make_guess
 
       return if guess.nil?
@@ -27,7 +27,7 @@ class Game
     end
 
     display_layout
-    
+
     puts
     puts player_won? ? 'Congrats! You guessed it.' : 'You run out of guesses.'
   end
@@ -66,11 +66,15 @@ class Game
     print 'Guess: '
     guess = gets.chomp.downcase
 
-    if guess == 'save'
+    case guess
+    when 'save'
       save_game
-      nil
-    else
+    when /^[a-z]$/ # If is a word character
       guess
+    else
+      puts
+      puts "Couldn't validate your guess. Try again."
+      make_guess
     end
   end
 
