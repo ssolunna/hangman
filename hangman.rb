@@ -2,8 +2,12 @@
 
 require 'json'
 
+# Hangman
 class Game
   def initialize(dictionary)
+    display_intro
+    puts
+
     return if File.exist?('saved_game.txt') && load_saved_game?
 
     @dictionary = load_dictionary(dictionary)
@@ -11,6 +15,14 @@ class Game
     @chances = 5 # Num of incorrect guesses allowed
     @correct_letters = []
     @incorrect_letters = []
+  end
+
+  def display_intro
+    puts ' Game: Hangman'
+    puts 'About: Guess a computer generated word by typing letters'
+    puts '       within a certain number of guesses (chances).'
+    puts 'Rules: - You can only type 1 letter per guess'
+    puts '       - Type "save" if you want to save the current game'
   end
 
   def play
