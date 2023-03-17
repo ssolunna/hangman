@@ -15,18 +15,21 @@ class Game
 
   def play
     until @chances.zero? || player_won?
+      display_layout
+      
       guess = make_guess
 
       return if guess.nil?
 
+      puts
+
       log_guess(guess)
-
-      display_word
-
-      puts "Wrong guesses: '#{@incorrect_letters.join(' ')}'"
-
-      puts "Chances left: #{@chances}"
     end
+
+    display_layout
+    
+    puts
+    puts player_won? ? 'Congrats! You guessed it.' : 'You run out of guesses.'
   end
 
   def load_dictionary(file)
@@ -38,17 +41,25 @@ class Game
     dictionary.filter { |word| word.length > 4 && word.length < 13 }.sample
   end
 
+  def display_layout
+    display_word
+
+    print "  ||  Chances left: #{@chances}"
+
+    puts "  ||  Wrong guesses: '#{@incorrect_letters.join(' ')}'"
+  end
+
   def display_word
     print ' Word: '
 
-    if @correct_letters.empty?
+    if @chances.zero?
+      print @word
+    elsif @correct_letters.empty?
       @word.length.times { print '_' }
     else
       # Displays only the correct letter guess
       print @word.gsub(/[^#{@correct_letters.join}]/, '_')
     end
-
-    puts
   end
 
   def make_guess
@@ -86,12 +97,14 @@ class Game
       })
     end
 
+    puts
     puts 'Game saved.', 'Exiting...'
   end
 
   def load_saved_game?
     print 'Saved game detected. Do you want to load it? [y|N]: '
     response = gets.chomp
+    puts
 
     return unless response.downcase == 'y' || response.downcase == 'yes'
 
