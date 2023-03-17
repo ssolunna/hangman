@@ -8,7 +8,7 @@ class Game
     display_intro
     puts
 
-    return if File.exist?('saved_game.txt') && load_saved_game?
+    return if File.exist?('saved_game.json') && load_saved_game?
 
     @dictionary = load_dictionary(dictionary)
     @word = select_random_word(@dictionary)
@@ -104,7 +104,7 @@ class Game
   end
 
   def save_game
-    File.open('saved_game.txt', 'w') do |file|
+    File.open('saved_game.json', 'w') do |file|
       file.puts JSON.dump({
       word: @word,
       chances: @chances,
@@ -129,13 +129,13 @@ class Game
   end
 
   def load_game
-    saved_game = JSON.parse(File.read('saved_game.txt'))
+    saved_game = JSON.parse(File.read('saved_game.json'))
 
     saved_game.each do |variable, value|
       instance_variable_set("@#{variable}", value)
     end
 
-    File.delete('saved_game.txt')
+    File.delete('saved_game.json')
   end
 end
 
